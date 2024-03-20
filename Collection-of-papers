@@ -1,0 +1,37 @@
+  //Script Accounts For Existing Folders, make sure to delete folders with teachers name to avoid being skipped
+
+  function createFoldersAndCopyFile2() {
+  // Replace with your Google Sheet ID
+  var sheetId = '1RciPp2Nl2cBbF_kDtp_wp4vPkmZ-Ltb0uBn_bOkBlW4'; //
+
+  // Replace with your destination folder ID
+  var destinationFolderId = '1TbDsXylsoZEBhGp2Ln1si53_cab2D-9M'; //switch for new mocks, and round of mocks
+
+  // Replace with the ID of the file you want to copy
+  var fileToCopyId = '13XyfeCZhTRo_fL8f_D1tj-5xjZIQjkdLMN-JKVwvQLY';
+
+  var sheet = SpreadsheetApp.openById(sheetId).getActiveSheet();
+  var folderNames = sheet.getRange('C2:C' + sheet.getLastRow()).getValues();
+
+  var destinationFolder = DriveApp.getFolderById(destinationFolderId);
+
+  for (var i = 0; i < folderNames.length; i++) {
+    var folderName = folderNames[i][0];
+
+    // Skip empty cells
+    if (folderName.trim() !== '') {
+      // Check if folder with the same name already exists
+      var existingFolder = destinationFolder.getFoldersByName(folderName);
+      
+      if (existingFolder.hasNext()) {
+        Logger.log('Folder with name "' + folderName + '" already exists. Skipping folder creation.');
+      } else {
+        var newFolder = destinationFolder.createFolder(folderName);
+        Logger.log('Created folder: ' + newFolder.getName());
+
+        // Copy the file using its ID
+        copyFileById(fileToCopyId, newFolder);
+      }
+    }
+  }
+}
